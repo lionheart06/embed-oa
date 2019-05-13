@@ -1,0 +1,23 @@
+{
+  "name": "embed-oa",
+  "version": "1.0.0",
+  "description": "An example of embedding Oracle Analytics",
+  "main": "index.js",
+  "scripts": {
+    "start": "live-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lionheart06/embed-oa.git"
+  },
+  "author": "Richard El-Kadi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lionheart06/embed-oa/issues"
+  },
+  "homepage": "https://github.com/lionheart06/embed-oa#readme",
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
