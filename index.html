@@ -1,9 +1,58 @@
 <!DOCTYPE html>
 <html><head>
    <title>Embedding Demo</title>
+   <script src="https://gratis-analyticsdev.analytics.ocp.oraclecloud.com/dv/ui/api/v1/plugins/embedding/standalone/embedding.js"></script>
+   <script>
+         var columns = [
+            {
+               "columnID":"M1",
+               "columnFormula": {
+                  "expr":{
+                     "expression":"XSA('richard.el.kadi@oracle.com'.'Demo').\"Columns\".\"Inquiries\"",
+                     "type":"sawx:sqlExpression"
+                  }
+               },
+               "type":"saw:regularColumn"
+            }
+         ];
+         var criteria = {
+            "columns":columns,
+            "type":"saw:simpleCriteria"
+         }
+
+         var dataVisualizations = [
+            {
+               "vizPluginID":"oracle.bi.tech.performancetitle",
+               "logicalDataModel":{
+                  "_settingsVersion":"1.0.0",
+                  "logicalEdges":{
+                     "measures":{"logicalEdgeLayers":[{"columnID":"M1","type":"column"}]}
+                  }
+               }
+            }
+         ]
+         var projectConfig = {
+            "criteria":criteria,
+            "dataVisualizations":dataVisualizations
+         }
+   </script>
 </head>
 <body>
-
+   <div data-bind="project">
+      <oracle-dv project-json="{{projectJSON}}"/>
+   </div>
+   <script>
+      requirejs(['knockout', 'obitech-application/bi-definitions','ojs/ojcore','ojs/ojknockout','ojs/ojcomposite','jet-composites/oracle-dv/loader'],
+         function(ko,definitions){
+            var project = {
+               projectJSON:{
+                  "projectConfig":projectConfig,
+                  "_settingsVersion":"1.0.0"
+               }
+            };
+            ko.applyBindings(project);
+         });
+   </script>
 </body>
 
 </html>
