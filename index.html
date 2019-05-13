@@ -1,14 +1,24 @@
 <!DOCTYPE html>
-<html><head>
+<html dir="ltr"><head>
    <title>Embedding Demo</title>
-   <script src="https://gratis-analyticsdev.analytics.ocp.oraclecloud.com/dv/ui/api/v1/plugins/embedding/standalone/embedding.js"></script>
+   <script src="http://localhost:7101/bali/ui/api/v1/plugins/embedding/standalone/embedding.js"></script>
    <script>
          var columns = [
             {
                "columnID":"M1",
                "columnFormula": {
                   "expr":{
-                     "expression":"XSA('richard.el.kadi@oracle.com'.'Demo').\"Columns\".\"Inquiries\"",
+                     "expression":"XSA('bitechtest'.'Demo').\"Columns\".\"Inquiries\"",
+                     "type":"sawx:sqlExpression"
+                  }
+               },
+               "type":"saw:regularColumn"
+            },
+            {
+               "columnID":"M2",
+               "columnFormula":{
+                  "expr":{
+                     "expression":"XSA('bitechtest'.'Demo').\"Columns\".\"Quarter\"",
                      "type":"sawx:sqlExpression"
                   }
                },
@@ -20,37 +30,85 @@
             "type":"saw:simpleCriteria"
          }
 
+         var viewParameters = {
+            "id":"v1",
+            "showTitle":true
+         };
+
          var dataVisualizations = [
             {
-               "vizPluginID":"oracle.bi.tech.performancetitle",
+               "vizPluginID":"oracle.bi.tech.chart.bar",
                "logicalDataModel":{
                   "_settingsVersion":"1.0.0",
                   "logicalEdges":{
-                     "measures":{"logicalEdgeLayers":[{"columnID":"M1","type":"column"}]}
+                     "measures":{"logicalEdgeLayers":[{"columnID":"M1","type":"column"}]},
+                     "detail":{"logicalEdgeLayers":[{"columnID":"M2","type":"column"}]},
+                     "color":{"logicalEdgeLayers":[{"columnID":"M2","type":"column"}]}
                   }
-               }
+               },
             }
-         ]
+         ];
+
+         dataVisualizations[0].viewParameters = viewParameters;
+
          var projectConfig = {
             "criteria":criteria,
+            "layout":{
+               "type":"grid",
+               "areas":[["v1"]]
+            },
             "dataVisualizations":dataVisualizations
+         };
+
+         function changeTitle() {
+            requirejs(['obitech-framework/jsx'],function(jsx) {
+                  var json = jsx.clone(window.project.projectJson());
+                  json.projectConfig.dataVisualizations[0].viewParameters.title = document.getElementById('idChartTitle').value;
+                  window.project.projectJson(json);
+               });
+         };
+
+         function changeLegend(value) {
+            requirejs(['obitech-framework/jsx'],function(jsx){
+               var json=jsx.clone(window.project.projectJson());
+               var legendPosition = null;
+               if(value != "no_legend") {
+                  legendPosition=value;
+                  json.projectConfig.dataVisualizations[0].viewParameters.legend = legendPosition;
+               } else {
+                  delete json.projectConfig.dataVisualizations[0].viewParameters.legend;
+               }
+               window.project.projectJson(json);
+            });
+
          }
    </script>
 </head>
 <body>
-   <div data-bind="project">
-      <oracle-dv project-json="{{projectJSON}}"/>
+   <table>
+      <tr><td>Chart Title </td><td><input type="text" id="idChartTitle"><button id="idApply" onclick="changeTitle();return false;">Apply</button></td></tr>
+      <tr><td>Change Legend Position</td><td><select onchange="changeLegend(this.value);return false">
+         <option value="no_legend">No Legend</option>
+         <option value="top">Top</option>
+         <option value="bottom" selected>Bottom</option>
+         <option value="start">Start</option>
+         <option value="end">End</option>
+      </select></td></tr>
+   </table>
+   <div style="width:800px;height:800px">
+      <oracle-dv id="idOracleDV" project-json="{{projectJson}}"/>
    </div>
    <script>
       requirejs(['knockout', 'obitech-application/bi-definitions','ojs/ojcore','ojs/ojknockout','ojs/ojcomposite','jet-composites/oracle-dv/loader'],
          function(ko,definitions){
-            var project = {
-               projectJSON:{
+            window.project = {
+               "projectJson":ko.observable({
                   "projectConfig":projectConfig,
                   "_settingsVersion":"1.0.0"
-               }
+               })
             };
-            ko.applyBindings(project);
+
+            ko.applyBindings(window.project, document.getElementById('idOracleDV'));
          });
    </script>
 </body>
